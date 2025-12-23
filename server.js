@@ -13,8 +13,9 @@ const PORT = process.env.PORT || 3000;
 app.use(cors()); // Allow frontend to communicate with backend
 app.use(express.json());
 
-// Initialize Google AI on the server side
-const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// Initialize Google AI on the server side (if configured)
+const geminiApiKey = process.env.GEMINI_API_KEY;
+const genAI = geminiApiKey ? new GoogleGenAI({ apiKey: geminiApiKey }) : null;
 
 /**
  * Endpoint: /api/submit
@@ -66,6 +67,10 @@ app.post('/api/submit', async (req, res) => {
  */
 app.post('/api/refine', async (req, res) => {
   try {
+    if (!genAI) {
+      return res.status(500).json({ error: 'GEMINI_API_KEY is not configured.' });
+    }
+
     const { text, category, role } = req.body;
 
     if (!text) {
