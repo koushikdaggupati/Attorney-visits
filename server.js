@@ -13,6 +13,10 @@ const PORT = process.env.PORT || 3000;
 app.use(cors()); // Allow frontend to communicate with backend
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.status(200).send('NYC DOC Inquiry Portal API is running.');
+});
+
 // Initialize Google AI on the server side (if configured)
 const geminiApiKey = process.env.GEMINI_API_KEY;
 const genAI = geminiApiKey ? new GoogleGenAI({ apiKey: geminiApiKey }) : null;
