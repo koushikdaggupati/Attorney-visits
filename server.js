@@ -2,19 +2,25 @@ import express from 'express';
 import cors from 'cors';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const distPath = path.join(__dirname, 'dist');
 
 // Middleware
 app.use(cors()); // Allow frontend to communicate with backend
 app.use(express.json());
 
+app.use(express.static(distPath));
+
 app.get('/', (req, res) => {
-  res.status(200).send('NYC DOC Inquiry Portal API is running.');
+  res.sendFile(path.join(distPath, 'index.html'));
 });
 
 // Initialize Google AI on the server side (if configured)
