@@ -6,10 +6,16 @@ export interface FormData {
   phone: string;
   firmName: string;
   firmAddress: string;
-  hasAdditionalVisitor: string;
-  additionalVisitorName: string;
-  additionalVisitorEmail: string;
-  additionalVisitorPhone: string;
+  additionalVisitorCount: string;
+  additionalVisitorOneName: string;
+  additionalVisitorOneEmail: string;
+  additionalVisitorOnePhone: string;
+  additionalVisitorTwoName: string;
+  additionalVisitorTwoEmail: string;
+  additionalVisitorTwoPhone: string;
+  additionalVisitorThreeName: string;
+  additionalVisitorThreeEmail: string;
+  additionalVisitorThreePhone: string;
   
   // Step 2: Client (PIC) Details
   picFirstName: string;
@@ -34,10 +40,16 @@ export const INITIAL_DATA: FormData = {
   phone: '',
   firmName: '',
   firmAddress: '',
-  hasAdditionalVisitor: 'no',
-  additionalVisitorName: '',
-  additionalVisitorEmail: '',
-  additionalVisitorPhone: '',
+  additionalVisitorCount: '0',
+  additionalVisitorOneName: '',
+  additionalVisitorOneEmail: '',
+  additionalVisitorOnePhone: '',
+  additionalVisitorTwoName: '',
+  additionalVisitorTwoEmail: '',
+  additionalVisitorTwoPhone: '',
+  additionalVisitorThreeName: '',
+  additionalVisitorThreeEmail: '',
+  additionalVisitorThreePhone: '',
   
   picFirstName: '',
   picLastName: '',

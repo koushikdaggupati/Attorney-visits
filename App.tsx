@@ -145,7 +145,7 @@ const App: React.FC = () => {
                     <h3 className="text-xl font-semibold text-slate-900 mt-6 mb-2">Form Instructions</h3>
                     <p className="text-slate-700 leading-relaxed">
                       To ensure your scheduled visit is received, please complete this form in it its’ entirety. If your
-                      registration contains more three persons, please contact XXX. If you are visiting multiple clients,
+                      registration contains more than four persons, please contact XXX. If you are visiting multiple clients,
                       a separate form must be generated for each. Upon submission, you will receive an email confirming
                       your visit. Please save your confirmation for future reference.
                     </p>
