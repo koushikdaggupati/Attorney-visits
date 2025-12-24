@@ -64,16 +64,18 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
           placeholder="PIC's Last Name"
           pattern="[A-Za-z \-\.]+"
         />
-        <Select
-          label="Facility"
-          value={data.facility}
-          onChange={(e) => updateData({ facility: e.target.value })}
-          required
-          options={[
-            { value: "", label: "Select a facility..." },
-            ...FACILITIES.map((facility) => ({ value: facility, label: facility }))
-          ]}
-        />
+        <div className="md:col-span-2">
+          <Select
+            label="Facility"
+            value={data.facility}
+            onChange={(e) => updateData({ facility: e.target.value })}
+            required
+            options={[
+              { value: "", label: "Select a facility..." },
+              ...FACILITIES.map((facility) => ({ value: facility, label: facility }))
+            ]}
+          />
+        </div>
       </div>
 
       <div className="pt-4 border-t border-slate-200">
