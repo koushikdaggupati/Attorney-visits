@@ -41,12 +41,14 @@ export const MessageStep: React.FC<Props> = ({ data, updateData, onNext, onBack 
 
   const endOfDayMinutes = 18 * 60;
   const durationMinutes = durationToMinutes(data.visitDuration);
-  const availableTimeSlots = TIME_SLOTS.filter((slot) => {
-    if (durationMinutes < 90) {
-      return true;
-    }
-    return parseTimeToMinutes(slot) + durationMinutes <= endOfDayMinutes;
-  });
+  const availableTimeSlots = durationMinutes
+    ? TIME_SLOTS.filter((slot) => {
+        if (durationMinutes < 90) {
+          return true;
+        }
+        return parseTimeToMinutes(slot) + durationMinutes <= endOfDayMinutes;
+      })
+    : [];
 
   const formatDate = (date: Date) => date.toISOString().split('T')[0];
   const today = new Date();
@@ -93,19 +95,10 @@ export const MessageStep: React.FC<Props> = ({ data, updateData, onNext, onBack 
               value={data.preferredTime}
               onChange={(e) => updateData({ preferredTime: e.target.value })}
               required
+              disabled={!data.visitDuration}
               options={[
-                  { value: "", label: "Select a time..." },
+                  { value: "", label: data.visitDuration ? "Select a time..." : "Select duration first" },
                   ...availableTimeSlots.map(time => ({ value: time, label: time }))
-              ]}
-          />
-          <Select
-              label="Visit Duration"
-              value={data.visitDuration}
-              onChange={(e) => updateData({ visitDuration: e.target.value })}
-              required
-              options={[
-                  { value: "", label: "Select a duration..." },
-                  ...VISIT_DURATIONS.map(duration => ({ value: duration, label: duration }))
               ]}
           />
       </div>

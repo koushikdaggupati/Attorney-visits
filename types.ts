@@ -73,12 +73,6 @@ export const VISIT_DURATIONS = [
   "3 hours"
 ];
 
-export const VISIT_DURATIONS = [
-  "1 hour",
-  "1 hour 30 minutes",
-  "2 hours"
-];
-
 export const FACILITIES = [
   "Anna M. Kross Center (AMKC)",
   "George R. Vierno Center (GRVC)",
