@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormData, TIME_SLOTS } from '../../types';
+import { FormData, TIME_SLOTS, VISIT_DURATIONS } from '../../types';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { Button } from '../ui/Button';
@@ -17,6 +17,36 @@ export const MessageStep: React.FC<Props> = ({ data, updateData, onNext, onBack 
     e.preventDefault();
     onNext();
   };
+
+  const parseTimeToMinutes = (time: string) => {
+    const [clock, meridiem] = time.split(' ');
+    const [rawHours, rawMinutes] = clock.split(':').map(Number);
+    const normalizedHours = rawHours % 12;
+    const hours = meridiem === 'PM' ? normalizedHours + 12 : normalizedHours;
+    return hours * 60 + rawMinutes;
+  };
+
+  const durationToMinutes = (duration: string) => {
+    switch (duration) {
+      case '1 hour':
+        return 60;
+      case '1 hour 30 minutes':
+        return 90;
+      case '3 hours':
+        return 180;
+      default:
+        return 0;
+    }
+  };
+
+  const endOfDayMinutes = 18 * 60;
+  const durationMinutes = durationToMinutes(data.visitDuration);
+  const availableTimeSlots = TIME_SLOTS.filter((slot) => {
+    if (durationMinutes < 90) {
+      return true;
+    }
+    return parseTimeToMinutes(slot) + durationMinutes <= endOfDayMinutes;
+  });
 
   const formatDate = (date: Date) => date.toISOString().split('T')[0];
   const today = new Date();
@@ -39,6 +69,16 @@ export const MessageStep: React.FC<Props> = ({ data, updateData, onNext, onBack 
           <h3 className="font-semibold text-nyc-blue flex items-center gap-2">
               <Clock size={16} /> Preferred Slot
           </h3>
+          <Select
+              label="Visit Duration"
+              value={data.visitDuration}
+              onChange={(e) => updateData({ visitDuration: e.target.value, preferredTime: '' })}
+              required
+              options={[
+                  { value: "", label: "Select a duration..." },
+                  ...VISIT_DURATIONS.map(duration => ({ value: duration, label: duration }))
+              ]}
+          />
           <Input
               label="Date"
               type="date"
@@ -49,13 +89,13 @@ export const MessageStep: React.FC<Props> = ({ data, updateData, onNext, onBack 
               required
           />
           <Select
-              label="Time Window"
+              label="Start Time"
               value={data.preferredTime}
               onChange={(e) => updateData({ preferredTime: e.target.value })}
               required
               options={[
                   { value: "", label: "Select a time..." },
-                  ...TIME_SLOTS.map(t => ({ value: t, label: t }))
+                  ...availableTimeSlots.map(time => ({ value: time, label: time }))
               ]}
           />
       </div>
