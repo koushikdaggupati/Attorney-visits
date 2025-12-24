@@ -38,7 +38,7 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
       <div className="space-y-1">
         <div className="flex items-center gap-2">
             <User className="text-nyc-gold" size={24} />
-            <h2 className="text-2xl font-bold text-slate-800">PIC Identification</h2>
+            <h2 className="text-2xl font-bold text-slate-800">PIC Information</h2>
         </div>
         <p className="text-slate-500">Identify the Person in Custody (PIC) you wish to visit.</p>
       </div>

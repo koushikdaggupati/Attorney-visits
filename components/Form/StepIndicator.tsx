@@ -9,7 +9,7 @@ interface StepIndicatorProps {
 export const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep, totalSteps }) => {
   const steps = [
     { id: 1, label: 'Attorney Info' },
-    { id: 2, label: 'PIC Identification' },
+    { id: 2, label: 'PIC Information' },
     { id: 3, label: 'Scheduling' },
     { id: 4, label: 'Review' },
   ];

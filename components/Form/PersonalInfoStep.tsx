@@ -157,7 +157,7 @@ export const PersonalInfoStep: React.FC<Props> = ({ data, updateData, onNext }) 
 
       <div className="pt-4 flex justify-end">
         <Button type="submit" rightIcon={<ArrowRight size={18} />}>
-          Next: PIC Identification
+          Next: PIC Information
         </Button>
       </div>
     </form>
