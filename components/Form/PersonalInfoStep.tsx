@@ -3,6 +3,7 @@ import { FormData } from '../../types';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { AddressAutocomplete } from '../ui/AddressAutocomplete';
+import { Select } from '../ui/Select';
 import { ArrowRight, Briefcase } from 'lucide-react';
 
 interface Props {
@@ -15,6 +16,17 @@ export const PersonalInfoStep: React.FC<Props> = ({ data, updateData, onNext }) 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onNext();
+  };
+
+  const handleVisitorChange = (value: string) => {
+    updateData({ hasAdditionalVisitor: value });
+    if (value !== 'yes') {
+      updateData({
+        additionalVisitorName: '',
+        additionalVisitorEmail: '',
+        additionalVisitorPhone: ''
+      });
+    }
   };
 
   return (
@@ -98,6 +110,49 @@ export const PersonalInfoStep: React.FC<Props> = ({ data, updateData, onNext }) 
           pattern="^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"
           title="Please enter a valid phone number (e.g., 212-555-0123)"
         />
+      </div>
+
+      <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-4">
+        <Select
+          label="Will an additional visitor attend?"
+          value={data.hasAdditionalVisitor}
+          onChange={(e) => handleVisitorChange(e.target.value)}
+          required
+          options={[
+            { value: "no", label: "No" },
+            { value: "yes", label: "Yes, one additional visitor" }
+          ]}
+        />
+
+        {data.hasAdditionalVisitor === 'yes' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
+            <Input
+              label="Additional Visitor Full Name"
+              value={data.additionalVisitorName}
+              onChange={(e) => updateData({ additionalVisitorName: e.target.value })}
+              required
+              placeholder="e.g. Jane Doe"
+            />
+            <Input
+              label="Additional Visitor Email"
+              type="email"
+              value={data.additionalVisitorEmail}
+              onChange={(e) => updateData({ additionalVisitorEmail: e.target.value })}
+              required
+              placeholder="visitor@email.com"
+            />
+            <Input
+              label="Additional Visitor Phone"
+              type="tel"
+              value={data.additionalVisitorPhone}
+              onChange={(e) => updateData({ additionalVisitorPhone: e.target.value })}
+              required
+              placeholder="(212) 555-0123"
+              pattern="^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"
+              title="Please enter a valid phone number (e.g., 212-555-0123)"
+            />
+          </div>
+        )}
       </div>
 
       <div className="pt-4 flex justify-end">
