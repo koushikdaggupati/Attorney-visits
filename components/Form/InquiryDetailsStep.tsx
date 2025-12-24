@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { FormData } from '../../types';
+import { FACILITIES, FormData } from '../../types';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
+import { Select } from '../ui/Select';
 import { ArrowLeft, ArrowRight, User, Fingerprint, FileText } from 'lucide-react';
 
 interface Props {
@@ -62,6 +63,16 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
           required
           placeholder="PIC's Last Name"
           pattern="[A-Za-z \-\.]+"
+        />
+        <Select
+          label="Facility"
+          value={data.facility}
+          onChange={(e) => updateData({ facility: e.target.value })}
+          required
+          options={[
+            { value: "", label: "Select a facility..." },
+            ...FACILITIES.map((facility) => ({ value: facility, label: facility }))
+          ]}
         />
       </div>
 

@@ -44,6 +44,21 @@ export const ReviewStep: React.FC<Props> = ({ data, onBack, onSubmit, isSubmitti
             </div>
         </div>
 
+        {data.hasAdditionalVisitor === 'yes' && (
+          <>
+            <div className="bg-slate-50 px-6 py-3 border-y border-slate-200">
+              <h3 className="font-bold text-slate-700">Additional Visitor</h3>
+            </div>
+            <div className="px-6 py-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+                <ReviewItem label="Full Name" value={data.additionalVisitorName} />
+                <ReviewItem label="Email" value={data.additionalVisitorEmail} />
+                <ReviewItem label="Phone" value={data.additionalVisitorPhone} />
+              </div>
+            </div>
+          </>
+        )}
+
         {/* Section 2: Client */}
         <div className="bg-slate-50 px-6 py-3 border-y border-slate-200">
             <h3 className="font-bold text-slate-700">Person In Custody (PIC)</h3>
@@ -51,6 +66,7 @@ export const ReviewStep: React.FC<Props> = ({ data, onBack, onSubmit, isSubmitti
         <div className="px-6 py-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
                 <ReviewItem label="PIC Name" value={`${data.picFirstName} ${data.picLastName}`} />
+                <ReviewItem label="Facility" value={data.facility} />
                 {/* Dynamically show either NYSID or Book & Case */}
                 {data.nysid && <ReviewItem label="NYSID" value={data.nysid} />}
                 {data.bookAndCase && <ReviewItem label="Book & Case" value={data.bookAndCase} />}
@@ -64,7 +80,6 @@ export const ReviewStep: React.FC<Props> = ({ data, onBack, onSubmit, isSubmitti
         <div className="px-6 py-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
                 <ReviewItem label="Preferred Slot" value={`${data.preferredDate} @ ${data.preferredTime}`} />
-                <ReviewItem label="Alternative Slot" value={`${data.alternativeDate} @ ${data.alternativeTime}`} />
             </div>
         </div>
       </div>
