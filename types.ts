@@ -74,9 +74,11 @@ export const VISIT_DURATIONS = [
 ];
 
 export const FACILITIES = [
-  "Anna M. Kross Center (AMKC)",
+  "RMSC Enhanced Supervised Housing (RESH)",
   "George R. Vierno Center (GRVC)",
+  "Rose M. Singer Center (RMSC)",
+  "North Infirmary Command/West Facility (NIC-WF)",
+  "Eric M. Taylor Center (EMTC)",
   "Robert N. Davoren Center (RNDC)",
-  "Otis Bantum Correctional Center (OBCC)",
-  "George Motchan Detention Center (GMDC)"
+  "Otis Bantum Correctional Center (OBCC)"
 ];
