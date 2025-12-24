@@ -114,7 +114,7 @@ export const PersonalInfoStep: React.FC<Props> = ({ data, updateData, onNext }) 
 
       <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-4">
         <Select
-          label="Will an additional visitor attend?"
+          label="Additional visitor?"
           value={data.hasAdditionalVisitor}
           onChange={(e) => handleVisitorChange(e.target.value)}
           required
