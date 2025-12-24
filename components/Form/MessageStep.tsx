@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormData, TIME_SLOTS } from '../../types';
+import { FormData, TIME_SLOTS, VISIT_DURATIONS } from '../../types';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { Button } from '../ui/Button';
@@ -56,6 +56,16 @@ export const MessageStep: React.FC<Props> = ({ data, updateData, onNext, onBack 
               options={[
                   { value: "", label: "Select a time..." },
                   ...TIME_SLOTS.map(t => ({ value: t, label: t }))
+              ]}
+          />
+          <Select
+              label="Visit Duration"
+              value={data.visitDuration}
+              onChange={(e) => updateData({ visitDuration: e.target.value })}
+              required
+              options={[
+                  { value: "", label: "Select a duration..." },
+                  ...VISIT_DURATIONS.map(duration => ({ value: duration, label: duration }))
               ]}
           />
       </div>

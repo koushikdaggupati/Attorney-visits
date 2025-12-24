@@ -80,6 +80,7 @@ export const ReviewStep: React.FC<Props> = ({ data, onBack, onSubmit, isSubmitti
         <div className="px-6 py-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
                 <ReviewItem label="Preferred Slot" value={`${data.preferredDate} @ ${data.preferredTime}`} />
+                <ReviewItem label="Visit Duration" value={data.visitDuration} />
             </div>
         </div>
       </div>
