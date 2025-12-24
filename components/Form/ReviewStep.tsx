@@ -44,17 +44,44 @@ export const ReviewStep: React.FC<Props> = ({ data, onBack, onSubmit, isSubmitti
             </div>
         </div>
 
-        {data.hasAdditionalVisitor === 'yes' && (
+        {Number.parseInt(data.additionalVisitorCount, 10) >= 1 && (
           <>
             <div className="bg-slate-50 px-6 py-3 border-y border-slate-200">
-              <h3 className="font-bold text-slate-700">Additional Visitor</h3>
+              <h3 className="font-bold text-slate-700">Additional Visitors</h3>
             </div>
-            <div className="px-6 py-2">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
-                <ReviewItem label="Full Name" value={data.additionalVisitorName} />
-                <ReviewItem label="Email" value={data.additionalVisitorEmail} />
-                <ReviewItem label="Phone" value={data.additionalVisitorPhone} />
-              </div>
+            <div className="px-6 py-2 space-y-4">
+              {[
+                {
+                  name: data.additionalVisitorOneName,
+                  email: data.additionalVisitorOneEmail,
+                  phone: data.additionalVisitorOnePhone,
+                },
+                {
+                  name: data.additionalVisitorTwoName,
+                  email: data.additionalVisitorTwoEmail,
+                  phone: data.additionalVisitorTwoPhone,
+                },
+                {
+                  name: data.additionalVisitorThreeName,
+                  email: data.additionalVisitorThreeEmail,
+                  phone: data.additionalVisitorThreePhone,
+                },
+              ]
+                .slice(0, Number.parseInt(data.additionalVisitorCount, 10))
+                .map((visitor, index) => (
+                  <div key={`additional-visitor-${index}`} className="border border-slate-100 rounded-lg">
+                    <div className="bg-slate-50 px-4 py-2 border-b border-slate-100 text-sm font-semibold text-slate-600">
+                      Additional Visitor {index + 1}
+                    </div>
+                    <div className="px-4 py-2">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+                        <ReviewItem label="Full Name" value={visitor.name} />
+                        <ReviewItem label="Email" value={visitor.email} />
+                        <ReviewItem label="Phone" value={visitor.phone} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
             </div>
           </>
         )}

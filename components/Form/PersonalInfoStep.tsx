@@ -19,14 +19,28 @@ export const PersonalInfoStep: React.FC<Props> = ({ data, updateData, onNext }) 
   };
 
   const handleVisitorChange = (value: string) => {
-    updateData({ hasAdditionalVisitor: value });
-    if (value !== 'yes') {
-      updateData({
-        additionalVisitorName: '',
-        additionalVisitorEmail: '',
-        additionalVisitorPhone: ''
-      });
+    const count = Number.parseInt(value, 10);
+    const resetData: Partial<FormData> = { additionalVisitorCount: value };
+
+    if (count < 3) {
+      resetData.additionalVisitorThreeName = '';
+      resetData.additionalVisitorThreeEmail = '';
+      resetData.additionalVisitorThreePhone = '';
     }
+
+    if (count < 2) {
+      resetData.additionalVisitorTwoName = '';
+      resetData.additionalVisitorTwoEmail = '';
+      resetData.additionalVisitorTwoPhone = '';
+    }
+
+    if (count < 1) {
+      resetData.additionalVisitorOneName = '';
+      resetData.additionalVisitorOneEmail = '';
+      resetData.additionalVisitorOnePhone = '';
+    }
+
+    updateData(resetData);
   };
 
   return (
@@ -114,38 +128,100 @@ export const PersonalInfoStep: React.FC<Props> = ({ data, updateData, onNext }) 
 
       <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-4">
         <Select
-          label="Additional visitor?"
-          value={data.hasAdditionalVisitor}
+          label="Additional visitors?"
+          value={data.additionalVisitorCount}
           onChange={(e) => handleVisitorChange(e.target.value)}
           required
           options={[
-            { value: "no", label: "No" },
-            { value: "yes", label: "Yes, one additional visitor" }
+            { value: "0", label: "No additional visitors" },
+            { value: "1", label: "1 additional visitor" },
+            { value: "2", label: "2 additional visitors" },
+            { value: "3", label: "3 additional visitors" }
           ]}
         />
 
-        {data.hasAdditionalVisitor === 'yes' && (
+        {Number.parseInt(data.additionalVisitorCount, 10) >= 1 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
             <Input
-              label="Additional Visitor Full Name"
-              value={data.additionalVisitorName}
-              onChange={(e) => updateData({ additionalVisitorName: e.target.value })}
+              label="Additional Visitor 1 Full Name"
+              value={data.additionalVisitorOneName}
+              onChange={(e) => updateData({ additionalVisitorOneName: e.target.value })}
               required
               placeholder="e.g. Jane Doe"
             />
             <Input
-              label="Additional Visitor Email"
+              label="Additional Visitor 1 Email"
               type="email"
-              value={data.additionalVisitorEmail}
-              onChange={(e) => updateData({ additionalVisitorEmail: e.target.value })}
+              value={data.additionalVisitorOneEmail}
+              onChange={(e) => updateData({ additionalVisitorOneEmail: e.target.value })}
               required
               placeholder="visitor@email.com"
             />
             <Input
-              label="Additional Visitor Phone"
+              label="Additional Visitor 1 Phone"
               type="tel"
-              value={data.additionalVisitorPhone}
-              onChange={(e) => updateData({ additionalVisitorPhone: e.target.value })}
+              value={data.additionalVisitorOnePhone}
+              onChange={(e) => updateData({ additionalVisitorOnePhone: e.target.value })}
+              required
+              placeholder="(212) 555-0123"
+              pattern="^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"
+              title="Please enter a valid phone number (e.g., 212-555-0123)"
+            />
+          </div>
+        )}
+
+        {Number.parseInt(data.additionalVisitorCount, 10) >= 2 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
+            <Input
+              label="Additional Visitor 2 Full Name"
+              value={data.additionalVisitorTwoName}
+              onChange={(e) => updateData({ additionalVisitorTwoName: e.target.value })}
+              required
+              placeholder="e.g. Jordan Smith"
+            />
+            <Input
+              label="Additional Visitor 2 Email"
+              type="email"
+              value={data.additionalVisitorTwoEmail}
+              onChange={(e) => updateData({ additionalVisitorTwoEmail: e.target.value })}
+              required
+              placeholder="visitor@email.com"
+            />
+            <Input
+              label="Additional Visitor 2 Phone"
+              type="tel"
+              value={data.additionalVisitorTwoPhone}
+              onChange={(e) => updateData({ additionalVisitorTwoPhone: e.target.value })}
+              required
+              placeholder="(212) 555-0123"
+              pattern="^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"
+              title="Please enter a valid phone number (e.g., 212-555-0123)"
+            />
+          </div>
+        )}
+
+        {Number.parseInt(data.additionalVisitorCount, 10) >= 3 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
+            <Input
+              label="Additional Visitor 3 Full Name"
+              value={data.additionalVisitorThreeName}
+              onChange={(e) => updateData({ additionalVisitorThreeName: e.target.value })}
+              required
+              placeholder="e.g. Taylor Lee"
+            />
+            <Input
+              label="Additional Visitor 3 Email"
+              type="email"
+              value={data.additionalVisitorThreeEmail}
+              onChange={(e) => updateData({ additionalVisitorThreeEmail: e.target.value })}
+              required
+              placeholder="visitor@email.com"
+            />
+            <Input
+              label="Additional Visitor 3 Phone"
+              type="tel"
+              value={data.additionalVisitorThreePhone}
+              onChange={(e) => updateData({ additionalVisitorThreePhone: e.target.value })}
               required
               placeholder="(212) 555-0123"
               pattern="^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"
