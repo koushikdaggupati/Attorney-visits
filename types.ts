@@ -21,6 +21,7 @@ export interface FormData {
   // Step 3: Scheduling
   preferredDate: string;
   preferredTime: string;
+  visitDuration: string;
 
   // Security (Honeypot)
   fax: string;
@@ -46,23 +47,30 @@ export const INITIAL_DATA: FormData = {
   
   preferredDate: '',
   preferredTime: '',
+  visitDuration: '',
 
   fax: '' // Should remain empty
 };
 
 export const TIME_SLOTS = [
-  "08:00 AM - 09:00 AM",
-  "09:00 AM - 10:00 AM",
-  "10:00 AM - 11:00 AM",
-  "11:00 AM - 12:00 PM",
-  "12:00 PM - 01:00 PM",
-  "01:00 PM - 02:00 PM",
-  "02:00 PM - 03:00 PM",
-  "03:00 PM - 04:00 PM",
-  "04:00 PM - 05:00 PM",
-  "05:00 PM - 06:00 PM",
-  "06:00 PM - 07:00 PM",
-  "07:00 PM - 08:00 PM"
+  "08:00 AM",
+  "09:00 AM",
+  "10:00 AM",
+  "11:00 AM",
+  "12:00 PM",
+  "01:00 PM",
+  "02:00 PM",
+  "03:00 PM",
+  "04:00 PM",
+  "05:00 PM",
+  "06:00 PM",
+  "07:00 PM"
+];
+
+export const VISIT_DURATIONS = [
+  "1 hour",
+  "1 hour 30 minutes",
+  "3 hours"
 ];
 
 export const FACILITIES = [
