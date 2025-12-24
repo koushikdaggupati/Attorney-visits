@@ -70,7 +70,7 @@ export const TIME_SLOTS = [
 export const VISIT_DURATIONS = [
   "1 hour",
   "1 hour 30 minutes",
-  "3 hours"
+  "2 hours"
 ];
 
 export const FACILITIES = [

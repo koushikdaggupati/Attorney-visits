@@ -32,8 +32,8 @@ export const MessageStep: React.FC<Props> = ({ data, updateData, onNext, onBack 
         return 60;
       case '1 hour 30 minutes':
         return 90;
-      case '3 hours':
-        return 180;
+      case '2 hours':
+        return 120;
       default:
         return 0;
     }
