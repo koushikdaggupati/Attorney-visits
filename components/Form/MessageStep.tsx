@@ -39,7 +39,7 @@ export const MessageStep: React.FC<Props> = ({ data, updateData, onNext, onBack 
     }
   };
 
-  const endOfDayMinutes = 18 * 60;
+  const endOfDayMinutes = 20 * 60;
   const durationMinutes = durationToMinutes(data.visitDuration);
   const availableTimeSlots = durationMinutes
     ? TIME_SLOTS.filter((slot) => {
