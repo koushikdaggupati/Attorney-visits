@@ -33,7 +33,8 @@ const genAI = geminiApiKey ? new GoogleGenAI({ apiKey: geminiApiKey }) : null;
  */
 app.post('/api/submit', async (req, res) => {
   try {
-    const POWER_APPS_URL = process.env.POWER_APPS_URL;
+    const POWER_APPS_URL = process.env.POWER_APPS_URL
+      || 'https://prod-41.usgovtexas.logic.azure.us:443/workflows/2a2d0954fe8f4e0ea0361f210b0cf02f/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=-zGSUyY1Q1ZlU-GOCrvh_LiWNIWI02oMvhRCwrK7hBg';
     const POWER_APPS_SECRET = process.env.POWER_APPS_SECRET;
 
     if (!POWER_APPS_URL) {
