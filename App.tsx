@@ -7,7 +7,7 @@ import { InquiryDetailsStep } from './components/Form/InquiryDetailsStep';
 import { MessageStep } from './components/Form/MessageStep';
 import { ReviewStep } from './components/Form/ReviewStep';
 import { FormData, INITIAL_DATA } from './types';
-import { CheckCircle, Lock } from 'lucide-react';
+import { ArrowRight, CheckCircle, Lock } from 'lucide-react';
 
 // When deployed, replace this empty string with your actual Cloud Run URL
 // e.g., "https://nyc-doc-backend-xyz.a.run.app"
@@ -15,7 +15,7 @@ import { CheckCircle, Lock } from 'lucide-react';
 const API_BASE_URL = ''; 
 
 const App: React.FC = () => {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [formData, setFormData] = useState<FormData>(INITIAL_DATA);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -32,12 +32,12 @@ const App: React.FC = () => {
   
   const prevStep = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setStep(prev => Math.max(prev - 1, 1));
+    setStep(prev => Math.max(prev - 1, 0));
   };
 
   const handleReset = () => {
     setFormData(INITIAL_DATA);
-    setStep(1);
+    setStep(0);
     setIsSuccess(false);
     setSubmitError(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -122,49 +122,123 @@ const App: React.FC = () => {
           
           {!isSuccess ? (
             <>
-                <div className="mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <StepIndicator currentStep={step} totalSteps={4} />
-                </div>
-
-                <div className="bg-white p-6 md:p-10 rounded-2xl shadow-xl border border-slate-200 ring-1 ring-slate-100 relative overflow-hidden">
+                {step === 0 ? (
+                  <div className="bg-white p-6 md:p-10 rounded-2xl shadow-xl border border-slate-200 ring-1 ring-slate-100 relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-nyc-blue via-nyc-gold to-nyc-blue"></div>
-                    
-                    {step === 1 && (
-                        <PersonalInfoStep 
-                            data={formData} 
-                            updateData={updateData} 
-                            onNext={nextStep} 
-                        />
-                    )}
-                    
-                    {step === 2 && (
-                        <InquiryDetailsStep 
-                            data={formData} 
-                            updateData={updateData} 
-                            onNext={nextStep} 
-                            onBack={prevStep} 
-                        />
-                    )}
-                    
-                    {step === 3 && (
-                        <MessageStep 
-                            data={formData} 
-                            updateData={updateData} 
-                            onNext={nextStep} 
-                            onBack={prevStep} 
-                        />
-                    )}
-                    
-                    {step === 4 && (
-                        <ReviewStep 
-                            data={formData} 
-                            onBack={prevStep} 
-                            onSubmit={handleSubmit}
-                            isSubmitting={isSubmitting}
-                            error={submitError}
-                        />
-                    )}
-                </div>
+                    <h2 className="text-2xl font-semibold text-slate-900 mb-4">Visitation Process</h2>
+                    <p className="text-slate-700 leading-relaxed">
+                      Attorneys and/or members of the legal defense team, may visit persons in custody either through
+                      walk-ins during designated hours or by scheduling an appointment in advance. Scheduled visits may
+                      be requested at least 24 hours and no more than seven (7) days prior to the requested date. In-person
+                      attorney visits occur seven days a week between the hours of 8AM-8PM. The final visit of the day
+                      will commence at 7PM.
+                    </p>
+
+                    <h3 className="text-xl font-semibold text-slate-900 mt-6 mb-2">Important Notice</h3>
+                    <p className="text-slate-700 leading-relaxed">
+                      While the Department will work diligently to honor your registered time, your visit start time may
+                      encounter delays if, it occurs during the daily count. Your visit will promptly resume upon count
+                      completion. Should there be any unforeseen delays, a facility representative will communicate such
+                      on the day of your visit.
+                    </p>
+
+                    <h3 className="text-xl font-semibold text-slate-900 mt-6 mb-2">Form Instructions</h3>
+                    <p className="text-slate-700 leading-relaxed">
+                      To ensure your scheduled visit is received, please complete this form in it its’ entirety. If your
+                      registration contains more three persons, please contact XXX. If you are visiting multiple clients,
+                      a separate form must be generated for each. Upon submission, you will receive an email confirming
+                      your visit. Please save your confirmation for future reference.
+                    </p>
+
+                    <h3 className="text-xl font-semibold text-slate-900 mt-6 mb-2">Cancellations</h3>
+                    <p className="text-slate-700 leading-relaxed">
+                      If you must cancel your registration, please email XXX at XXX to notify. Then, you may register for
+                      a new scheduled visit or, you may walk-in for same-day accommodations.
+                    </p>
+
+                    <h3 className="text-xl font-semibold text-slate-900 mt-6 mb-2">Late Arrivals</h3>
+                    <p className="text-slate-700 leading-relaxed">
+                      All scheduled visits are afforded a thirty (30) minute grace period. Should you arrive past this
+                      window, your visit will be accepted on a first-come, first serve basis.
+                    </p>
+
+                    <h3 className="text-xl font-semibold text-slate-900 mt-6 mb-2">Note</h3>
+                    <p className="text-slate-700 leading-relaxed mb-3">
+                      Attorney visits are not conducted on federal holidays. This includes:
+                    </p>
+                    <ul className="grid gap-2 text-slate-700 sm:grid-cols-2 list-disc list-inside">
+                      <li>New Year’s Day</li>
+                      <li>Martin Luther King Jr. Day</li>
+                      <li>President’s Day</li>
+                      <li>Memorial Day</li>
+                      <li>Labor Day</li>
+                      <li>Columbus Day</li>
+                      <li>Election Day</li>
+                      <li>Veteran's Day</li>
+                      <li>Juneteenth</li>
+                      <li>Independence Day</li>
+                      <li>Thanksgiving Day</li>
+                      <li>Christmas Day</li>
+                    </ul>
+
+                    <div className="mt-8 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={nextStep}
+                        className="px-6 py-3 bg-nyc-blue text-white rounded-lg font-semibold hover:bg-blue-800 transition-colors inline-flex items-center gap-2"
+                      >
+                        Next: Request Appointment
+                        <ArrowRight size={18} />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <StepIndicator currentStep={step} totalSteps={4} />
+                    </div>
+
+                    <div className="bg-white p-6 md:p-10 rounded-2xl shadow-xl border border-slate-200 ring-1 ring-slate-100 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-nyc-blue via-nyc-gold to-nyc-blue"></div>
+                        
+                        {step === 1 && (
+                            <PersonalInfoStep 
+                                data={formData} 
+                                updateData={updateData} 
+                                onNext={nextStep} 
+                            />
+                        )}
+                        
+                        {step === 2 && (
+                            <InquiryDetailsStep 
+                                data={formData} 
+                                updateData={updateData} 
+                                onNext={nextStep} 
+                                onBack={prevStep} 
+                            />
+                        )}
+                        
+                        {step === 3 && (
+                            <MessageStep 
+                                data={formData} 
+                                updateData={updateData} 
+                                onNext={nextStep} 
+                                onBack={prevStep} 
+                            />
+                        )}
+                        
+                        {step === 4 && (
+                            <ReviewStep 
+                                data={formData} 
+                                onBack={prevStep} 
+                                onSubmit={handleSubmit}
+                                isSubmitting={isSubmitting}
+                                error={submitError}
+                            />
+                        )}
+                    </div>
+                  </>
+                )}
                 
                 <div className="mt-6 text-center">
                   <p className="text-xs text-slate-400 flex items-center justify-center gap-1">
