@@ -11,8 +11,9 @@ export const Header: React.FC = () => {
           className="h-16 w-auto mr-4 md:mr-6"
         />
         <div className="flex flex-col justify-center">
-          <h1 className="font-black text-2xl md:text-3xl leading-none tracking-tight uppercase text-white font-sans">
-            NYC Department of Correction
+          <h1 className="font-black text-2xl md:text-3xl leading-none tracking-tight uppercase font-heading">
+            <span className="text-[#ED6125]">NYC</span>{' '}
+            <span className="text-white">Department of Correction</span>
           </h1>
           <span className="text-nyc-gold text-xs md:text-sm font-bold tracking-widest uppercase mt-1">
             Visit Scheduler
