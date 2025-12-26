@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header } from './components/Layout/Header';
 import { Footer } from './components/Layout/Footer';
 import { StepIndicator } from './components/Form/StepIndicator';
@@ -8,6 +8,7 @@ import { MessageStep } from './components/Form/MessageStep';
 import { ReviewStep } from './components/Form/ReviewStep';
 import { FormData, INITIAL_DATA } from './types';
 import { ArrowRight, CheckCircle, Lock } from 'lucide-react';
+import docLogo from './components/DOC Logo Vector (2).svg';
 
 // When deployed, replace this empty string with your actual Cloud Run URL
 // e.g., "https://nyc-doc-backend-xyz.a.run.app"
@@ -20,6 +21,27 @@ const App: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const existingIcon = document.querySelector<HTMLLinkElement>("link[rel~='icon']");
+
+    if (existingIcon) {
+      existingIcon.href = docLogo;
+      return;
+    }
+
+    const iconLink = document.createElement('link');
+    iconLink.rel = 'icon';
+    iconLink.type = 'image/svg+xml';
+    iconLink.href = docLogo;
+    document.head.appendChild(iconLink);
+
+    return () => {
+      if (iconLink.parentNode) {
+        iconLink.parentNode.removeChild(iconLink);
+      }
+    };
+  }, []);
 
   const updateData = (newData: Partial<FormData>) => {
     setFormData(prev => ({ ...prev, ...newData }));
