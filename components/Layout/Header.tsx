@@ -8,7 +8,7 @@ export const Header: React.FC = () => {
         <img
           src={docLogo}
           alt="NYC Department of Correction logo"
-          className="h-12 w-auto mr-4 md:mr-6"
+          className="h-16 w-auto mr-4 md:mr-6"
         />
         <div className="flex flex-col justify-center">
           <h1 className="font-black text-2xl md:text-3xl leading-none tracking-tight uppercase text-white font-sans">
