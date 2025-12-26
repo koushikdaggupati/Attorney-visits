@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -22,10 +21,6 @@ app.use(express.static(distPath));
 app.get('/', (req, res) => {
   res.sendFile(path.join(distPath, 'index.html'));
 });
-
-// Initialize Google AI on the server side (if configured)
-const geminiApiKey = process.env.GEMINI_API_KEY;
-const genAI = geminiApiKey ? new GoogleGenAI({ apiKey: geminiApiKey }) : null;
 
 /**
  * Endpoint: /api/submit
@@ -69,48 +64,6 @@ app.post('/api/submit', async (req, res) => {
   } catch (error) {
     console.error('Submission error:', error);
     return res.status(500).json({ error: 'Failed to submit data.' });
-  }
-});
-
-/**
- * Endpoint: /api/refine
- * Purpose: Uses Gemini API to refine text without exposing the API Key to the browser.
- */
-app.post('/api/refine', async (req, res) => {
-  try {
-    if (!genAI) {
-      return res.status(500).json({ error: 'GEMINI_API_KEY is not configured.' });
-    }
-
-    const { text, category, role } = req.body;
-
-    if (!text) {
-      return res.status(400).json({ error: 'Text is required' });
-    }
-
-    const prompt = `
-      You are a professional communication assistant for the NYC Department of Correction.
-      A user (${role}) is writing an inquiry regarding "${category}".
-      
-      The user's rough draft is:
-      "${text}"
-      
-      Please rewrite this message to be formal, clear, polite, and concise. 
-      Keep the tone respectful and professional. 
-      Do not invent new facts, just polish the language and structure.
-      Return ONLY the rewritten message text.
-    `;
-
-    const response = await genAI.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-    });
-
-    return res.status(200).json({ refinedText: response.text.trim() });
-
-  } catch (error) {
-    console.error('Gemini error:', error);
-    return res.status(500).json({ error: 'Failed to refine text.' });
   }
 });
 
