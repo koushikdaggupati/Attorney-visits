@@ -86,7 +86,7 @@ const App: React.FC = () => {
 
     // 2. Rate Limiting: Prevent rapid spam by checking last submission time.
     const lastSubmitTime = localStorage.getItem('nyc_doc_last_submit');
-    const COOLDOWN_MS = 1 * 60 * 1000; // 1 minute
+    const COOLDOWN_MS = 15 * 1000; // 15 seconds
 
     if (lastSubmitTime) {
         const timeDiff = Date.now() - parseInt(lastSubmitTime, 10);
