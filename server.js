@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import rateLimit from 'express-rate-limit';
 
 // Load environment variables
 dotenv.config();
@@ -16,6 +17,14 @@ const distPath = path.join(__dirname, 'dist');
 app.use(cors()); // Allow frontend to communicate with backend
 app.use(express.json());
 
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 10,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'Too many requests, please try again later.' }
+});
+
 app.use(express.static(distPath));
 
 app.get('/', (req, res) => {
@@ -26,7 +35,7 @@ app.get('/', (req, res) => {
  * Endpoint: /api/submit
  * Purpose: Securely forwards form data to Power Apps without exposing the URL/Secret to the client.
  */
-app.post('/api/submit', async (req, res) => {
+app.post('/api/submit', apiLimiter, async (req, res) => {
   try {
     const POWER_APPS_URL = process.env.POWER_APPS_URL
       || 'https://prod-41.usgovtexas.logic.azure.us:443/workflows/2a2d0954fe8f4e0ea0361f210b0cf02f/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=-zGSUyY1Q1ZlU-GOCrvh_LiWNIWI02oMvhRCwrK7hBg';
