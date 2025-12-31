@@ -27,6 +27,9 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
     ? 'Book & Case number must be exactly 10 digits.'
     : null;
 
+  const sanitizeName = (value: string) =>
+    value.replace(/^[^A-Za-z]+|[^A-Za-z]+$/g, '');
+
   useEffect(() => {
     const value = idType === 'nysid' ? data.nysid : data.bookAndCase;
     const trimmedValue = value.trim();
@@ -70,8 +73,8 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
 
         const payload = await response.json();
         updateData({
-          picFirstName: payload.picFirstName ?? '',
-          picLastName: payload.picLastName ?? ''
+          picFirstName: sanitizeName(payload.picFirstName ?? ''),
+          picLastName: sanitizeName(payload.picLastName ?? '')
         });
         setLastLookupValue(trimmedValue);
       } catch (error) {
@@ -107,9 +110,6 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
       updateData({ nysid: '' });
     }
   };
-
-  const sanitizeName = (value: string) =>
-    value.replace(/^[^A-Za-z]+|[^A-Za-z]+$/g, '');
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 animate-fadeIn">

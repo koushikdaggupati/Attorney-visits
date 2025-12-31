@@ -15,7 +15,7 @@ const distPath = path.join(__dirname, 'dist');
 
 // Middleware
 app.use(cors()); // Allow frontend to communicate with backend
-app.use(express.json());
+app.use(express.json({ limit: '100kb' }));
 
 const apiLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -43,6 +43,27 @@ const getDataverseScope = () => {
 
 let cachedToken = null;
 let tokenExpiresAt = 0;
+
+const sanitizeLeadingDots = (value) => {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  return String(value).replace(/^\.+/, '').trimStart();
+};
+
+const sanitizeSubmissionPayload = (payload) => {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    return null;
+  }
+
+  return {
+    ...payload,
+    firstName: sanitizeLeadingDots(payload.firstName ?? ''),
+    lastName: sanitizeLeadingDots(payload.lastName ?? ''),
+    picFirstName: sanitizeLeadingDots(payload.picFirstName ?? ''),
+    picLastName: sanitizeLeadingDots(payload.picLastName ?? '')
+  };
+};
 
 const getDataverseToken = async () => {
   if (!DATAVERSE_API_URL || !DATAVERSE_CLIENT_ID || !DATAVERSE_CLIENT_SECRET || !DATAVERSE_TENANT_ID) {
@@ -125,8 +146,8 @@ app.get('/api/pic-lookup', apiLimiter, async (req, res) => {
     }
 
     return res.status(200).json({
-      picFirstName: record.doc_firstname ?? '',
-      picLastName: record.doc_lastname ?? '',
+      picFirstName: sanitizeLeadingDots(record.doc_firstname ?? ''),
+      picLastName: sanitizeLeadingDots(record.doc_lastname ?? ''),
       nysid: record.doc_nysid ?? '',
       bookAndCase: record.doc_bookcasenumber ?? ''
     });
@@ -142,15 +163,16 @@ app.get('/api/pic-lookup', apiLimiter, async (req, res) => {
  */
 app.post('/api/submit', apiLimiter, async (req, res) => {
   try {
-    const POWER_APPS_URL = process.env.POWER_APPS_URL
-      || 'https://prod-41.usgovtexas.logic.azure.us:443/workflows/2a2d0954fe8f4e0ea0361f210b0cf02f/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=-zGSUyY1Q1ZlU-GOCrvh_LiWNIWI02oMvhRCwrK7hBg';
+    const POWER_APPS_URL = process.env.POWER_APPS_URL;
     const POWER_APPS_SECRET = process.env.POWER_APPS_SECRET;
 
     if (!POWER_APPS_URL) {
-      // Simulation mode if no URL is configured
-      console.log('Simulating submission:', req.body);
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      return res.status(200).json({ success: true, message: 'Simulated submission successful' });
+      return res.status(500).json({ error: 'Submission endpoint is not configured.' });
+    }
+
+    const sanitizedPayload = sanitizeSubmissionPayload(req.body);
+    if (!sanitizedPayload) {
+      return res.status(400).json({ error: 'Invalid submission payload.' });
     }
 
     const headers = {
@@ -165,7 +187,7 @@ app.post('/api/submit', apiLimiter, async (req, res) => {
     const response = await fetch(POWER_APPS_URL, {
       method: 'POST',
       headers: headers,
-      body: JSON.stringify(req.body)
+      body: JSON.stringify(sanitizedPayload)
     });
 
     if (!response.ok) {
