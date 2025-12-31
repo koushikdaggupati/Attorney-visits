@@ -20,12 +20,25 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
   const [lookupError, setLookupError] = useState<string | null>(null);
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [lastLookupValue, setLastLookupValue] = useState('');
+  const trimmedBookCase = data.bookAndCase.trim();
+  const hasBookCaseValue = trimmedBookCase.length > 0;
+  const isBookCaseLengthValid = !hasBookCaseValue || trimmedBookCase.length === 10;
+  const bookCaseValidationError = hasBookCaseValue && !isBookCaseLengthValid
+    ? 'Book & Case number must be exactly 10 digits.'
+    : null;
 
   useEffect(() => {
     const value = idType === 'nysid' ? data.nysid : data.bookAndCase;
     const trimmedValue = value.trim();
 
     if (!trimmedValue) {
+      setLookupError(null);
+      setIsLookingUp(false);
+      setLastLookupValue('');
+      return;
+    }
+
+    if (idType === 'bookCase' && trimmedValue.length !== 10) {
       setLookupError(null);
       setIsLookingUp(false);
       setLastLookupValue('');
@@ -95,6 +108,9 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
     }
   };
 
+  const sanitizeName = (value: string) =>
+    value.replace(/^[^A-Za-z]+|[^A-Za-z]+$/g, '');
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6 animate-fadeIn">
       <div className="space-y-1">
@@ -107,37 +123,6 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
 
       <div className="bg-blue-50 border-l-4 border-nyc-blue p-4 text-sm text-slate-700">
         <p>You must provide either the Book & Case Number or the NYSID to identify the individual.</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Input
-          label="PIC First Name"
-          value={data.picFirstName}
-          onChange={(e) => updateData({ picFirstName: e.target.value })}
-          required
-          placeholder="PIC's First Name"
-          pattern="[A-Za-z \-\.]+"
-        />
-        <Input
-          label="PIC Last Name"
-          value={data.picLastName}
-          onChange={(e) => updateData({ picLastName: e.target.value })}
-          required
-          placeholder="PIC's Last Name"
-          pattern="[A-Za-z \-\.]+"
-        />
-        <div className="md:col-span-2">
-          <Select
-            label="Facility"
-            value={data.facility}
-            onChange={(e) => updateData({ facility: e.target.value })}
-            required
-            options={[
-              { value: "", label: "Select a facility..." },
-              ...FACILITIES.map((facility) => ({ value: facility, label: facility }))
-            ]}
-          />
-        </div>
       </div>
 
       <div className="pt-4 border-t border-slate-200">
@@ -193,13 +178,44 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
                     onChange={(e) => updateData({ bookAndCase: e.target.value })}
                     required
                     placeholder="e.g. 87654321"
-                    helperText={isLookingUp ? 'Looking up PIC details...' : 'Department of Correction Booking Number'}
+                    helperText={isLookingUp ? 'Looking up PIC details...' : 'Enter the 10-digit booking number to auto-fill PIC details.'}
                     pattern="^[0-9]+$"
                     title="Book & Case number must be numeric only."
-                    maxLength={12}
-                    error={lookupError ?? undefined}
+                    maxLength={10}
+                    error={bookCaseValidationError ?? lookupError ?? undefined}
                 />
             )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Input
+          label="PIC First Name"
+          value={data.picFirstName}
+          onChange={(e) => updateData({ picFirstName: sanitizeName(e.target.value) })}
+          required
+          placeholder="PIC's First Name"
+          pattern="[A-Za-z \-\.]+"
+        />
+        <Input
+          label="PIC Last Name"
+          value={data.picLastName}
+          onChange={(e) => updateData({ picLastName: sanitizeName(e.target.value) })}
+          required
+          placeholder="PIC's Last Name"
+          pattern="[A-Za-z \-\.]+"
+        />
+        <div className="md:col-span-2">
+          <Select
+            label="Facility"
+            value={data.facility}
+            onChange={(e) => updateData({ facility: e.target.value })}
+            required
+            options={[
+              { value: "", label: "Select a facility..." },
+              ...FACILITIES.map((facility) => ({ value: facility, label: facility }))
+            ]}
+          />
         </div>
       </div>
 
