@@ -122,14 +122,15 @@ app.get('/api/pic-lookup', apiLimiter, async (req, res) => {
 
     const token = await getDataverseToken();
     const url = new URL(`${DATAVERSE_API_URL.replace(/\/$/, '')}/${DATAVERSE_ENTITY_SET}`);
-    url.searchParams.set('$select', 'doc_firstname,doc_lastname,doc_bookcasenumber,doc_nysid');
+    url.searchParams.set('$select', 'doc_firstname,doc_lastname,doc_bookcasenumber,doc_nysid,doc_facility');
     url.searchParams.set('$filter', filter);
     url.searchParams.set('$top', '1');
 
     const response = await fetch(url.toString(), {
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Prefer': 'odata.include-annotations="OData.Community.Display.V1.FormattedValue"'
       }
     });
 
@@ -145,11 +146,14 @@ app.get('/api/pic-lookup', apiLimiter, async (req, res) => {
       return res.status(404).json({ error: 'No matching PIC found.' });
     }
 
+    const facilityName = record?.['doc_facility@OData.Community.Display.V1.FormattedValue'] ?? '';
+
     return res.status(200).json({
       picFirstName: sanitizeLeadingDots(record.doc_firstname ?? ''),
       picLastName: sanitizeLeadingDots(record.doc_lastname ?? ''),
       nysid: record.doc_nysid ?? '',
-      bookAndCase: record.doc_bookcasenumber ?? ''
+      bookAndCase: record.doc_bookcasenumber ?? '',
+      facility: facilityName
     });
   } catch (error) {
     console.error('PIC lookup error:', error);

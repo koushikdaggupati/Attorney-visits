@@ -72,9 +72,15 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
         }
 
         const payload = await response.json();
+        const resolvedFacility = payload.facility
+          ? FACILITIES.find(
+            (facility) => facility.toLowerCase() === String(payload.facility).toLowerCase()
+          )
+          : undefined;
         updateData({
           picFirstName: sanitizeName(payload.picFirstName ?? ''),
-          picLastName: sanitizeName(payload.picLastName ?? '')
+          picLastName: sanitizeName(payload.picLastName ?? ''),
+          ...(resolvedFacility ? { facility: resolvedFacility } : {})
         });
         setLastLookupValue(trimmedValue);
       } catch (error) {
