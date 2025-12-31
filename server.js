@@ -32,6 +32,7 @@ const DATAVERSE_CLIENT_ID = process.env.DATAVERSE_CLIENT_ID;
 const DATAVERSE_CLIENT_SECRET = process.env.DATAVERSE_CLIENT_SECRET;
 const DATAVERSE_TENANT_ID = process.env.DATAVERSE_TENANT_ID;
 const DATAVERSE_ENTITY_SET = process.env.DATAVERSE_ENTITY_SET || 'doc_inmates';
+const DATAVERSE_FACILITY_FIELD = process.env.DATAVERSE_FACILITY_FIELD || 'doc_facility';
 
 const getDataverseScope = () => {
   if (!DATAVERSE_API_URL) {
@@ -121,18 +122,55 @@ app.get('/api/pic-lookup', apiLimiter, async (req, res) => {
       : `doc_bookcasenumber eq '${filterValue(bookAndCase)}'`;
 
     const token = await getDataverseToken();
-    const url = new URL(`${DATAVERSE_API_URL.replace(/\/$/, '')}/${DATAVERSE_ENTITY_SET}`);
-    url.searchParams.set('$select', 'doc_firstname,doc_lastname,doc_bookcasenumber,doc_nysid,doc_facility');
-    url.searchParams.set('$filter', filter);
-    url.searchParams.set('$top', '1');
+    const baseUrl = `${DATAVERSE_API_URL.replace(/\/$/, '')}/${DATAVERSE_ENTITY_SET}`;
+    const baseSelect = ['doc_firstname', 'doc_lastname', 'doc_bookcasenumber', 'doc_nysid'];
 
-    const response = await fetch(url.toString(), {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
-        'Prefer': 'odata.include-annotations="OData.Community.Display.V1.FormattedValue"'
+    const getFacilityFieldCandidates = () => {
+      const candidates = [DATAVERSE_FACILITY_FIELD];
+      if (!DATAVERSE_FACILITY_FIELD.startsWith('_') && !DATAVERSE_FACILITY_FIELD.endsWith('_value')) {
+        candidates.push(`_${DATAVERSE_FACILITY_FIELD}_value`);
       }
-    });
+      return Array.from(new Set(candidates));
+    };
+
+    const fetchRecord = async (facilityField) => {
+      const url = new URL(baseUrl);
+      const selectFields = facilityField
+        ? [...baseSelect, facilityField]
+        : baseSelect;
+      url.searchParams.set('$select', selectFields.join(','));
+      url.searchParams.set('$filter', filter);
+      url.searchParams.set('$top', '1');
+
+      return fetch(url.toString(), {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Prefer': 'odata.include-annotations="OData.Community.Display.V1.FormattedValue"'
+        }
+      });
+    };
+
+    const facilityFieldCandidates = getFacilityFieldCandidates();
+    let response = await fetchRecord(facilityFieldCandidates[0]);
+    let resolvedFacilityField = facilityFieldCandidates[0];
+    if (!response.ok) {
+      const errorText = await response.text();
+      const missingFieldError = response.status === 400
+        && errorText.includes('Could not find a property named');
+      if (missingFieldError) {
+        const fallbackField = facilityFieldCandidates.find((candidate) => candidate !== resolvedFacilityField);
+        if (fallbackField) {
+          response = await fetchRecord(fallbackField);
+          resolvedFacilityField = fallbackField;
+        } else {
+          response = await fetchRecord(null);
+          resolvedFacilityField = null;
+        }
+      } else {
+        throw new Error(`Dataverse request failed: ${response.status} ${errorText}`);
+      }
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -146,7 +184,9 @@ app.get('/api/pic-lookup', apiLimiter, async (req, res) => {
       return res.status(404).json({ error: 'No matching PIC found.' });
     }
 
-    const facilityName = record?.['doc_facility@OData.Community.Display.V1.FormattedValue'] ?? '';
+    const facilityName = resolvedFacilityField
+      ? record?.[`${resolvedFacilityField}@OData.Community.Display.V1.FormattedValue`]
+      : '';
 
     return res.status(200).json({
       picFirstName: sanitizeLeadingDots(record.doc_firstname ?? ''),
