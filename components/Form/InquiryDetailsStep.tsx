@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FACILITIES, FormData } from '../../types';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
@@ -17,6 +17,65 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
   const [idType, setIdType] = useState<'nysid' | 'bookCase'>(
     data.nysid && !data.bookAndCase ? 'nysid' : 'bookCase'
   );
+  const [lookupError, setLookupError] = useState<string | null>(null);
+  const [isLookingUp, setIsLookingUp] = useState(false);
+  const [lastLookupValue, setLastLookupValue] = useState('');
+
+  useEffect(() => {
+    const value = idType === 'nysid' ? data.nysid : data.bookAndCase;
+    const trimmedValue = value.trim();
+
+    if (!trimmedValue) {
+      setLookupError(null);
+      setIsLookingUp(false);
+      setLastLookupValue('');
+      return;
+    }
+
+    if (trimmedValue === lastLookupValue) {
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(async () => {
+      setIsLookingUp(true);
+      setLookupError(null);
+      try {
+        const params = new URLSearchParams(
+          idType === 'nysid' ? { nysid: trimmedValue } : { bookAndCase: trimmedValue }
+        );
+        const response = await fetch(`/api/pic-lookup?${params.toString()}`, {
+          signal: controller.signal
+        });
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error('No matching PIC found.');
+          }
+          throw new Error('Unable to retrieve PIC details.');
+        }
+
+        const payload = await response.json();
+        updateData({
+          picFirstName: payload.picFirstName ?? '',
+          picLastName: payload.picLastName ?? ''
+        });
+        setLastLookupValue(trimmedValue);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+        setLookupError(error instanceof Error ? error.message : 'Unable to retrieve PIC details.');
+      } finally {
+        setIsLookingUp(false);
+      }
+    }, 500);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [data.bookAndCase, data.nysid, idType, lastLookupValue, updateData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +84,9 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
 
   const handleTypeChange = (type: 'nysid' | 'bookCase') => {
     setIdType(type);
+    setLookupError(null);
+    setIsLookingUp(false);
+    setLastLookupValue('');
     // Clear the other field to ensure mutual exclusivity in the data
     if (type === 'nysid') {
       updateData({ bookAndCase: '' });
@@ -117,10 +179,11 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
                     onChange={(e) => updateData({ nysid: e.target.value.toUpperCase() })}
                     required
                     placeholder="e.g. 12345678Q"
-                    helperText="New York State Identification Number"
+                    helperText={isLookingUp ? 'Looking up PIC details...' : 'New York State Identification Number'}
                     pattern="^[0-9A-Z]+$"
                     title="NYSID must be alphanumeric."
                     maxLength={10}
+                    error={lookupError ?? undefined}
                 />
             ) : (
                 <Input
@@ -130,10 +193,11 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
                     onChange={(e) => updateData({ bookAndCase: e.target.value })}
                     required
                     placeholder="e.g. 87654321"
-                    helperText="Department of Correction Booking Number"
+                    helperText={isLookingUp ? 'Looking up PIC details...' : 'Department of Correction Booking Number'}
                     pattern="^[0-9]+$"
                     title="Book & Case number must be numeric only."
                     maxLength={12}
+                    error={lookupError ?? undefined}
                 />
             )}
         </div>
