@@ -29,6 +29,36 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
 
   const sanitizeName = (value: string) =>
     value.replace(/^[^A-Za-z]+|[^A-Za-z]+$/g, '');
+  const resolveFacility = (value?: string) => {
+    if (!value) {
+      return undefined;
+    }
+    const normalized = value.trim().toLowerCase();
+    if (!normalized) {
+      return undefined;
+    }
+    const exactMatch = FACILITIES.find(
+      (facility) => facility.toLowerCase() === normalized
+    );
+    if (exactMatch) {
+      return exactMatch;
+    }
+
+    const matchByCode = FACILITIES.find((facility) => {
+      const codeMatch = facility.match(/\(([^)]+)\)\s*$/);
+      return codeMatch?.[1]?.toLowerCase() === normalized;
+    });
+    if (matchByCode) {
+      return matchByCode;
+    }
+
+    const matchByName = FACILITIES.find((facility) => {
+      const facilityName = facility.replace(/\s*\([^)]*\)\s*$/, '');
+      return facilityName.trim().toLowerCase() === normalized;
+    });
+
+    return matchByName;
+  };
 
   useEffect(() => {
     const value = idType === 'nysid' ? data.nysid : data.bookAndCase;
@@ -72,11 +102,7 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
         }
 
         const payload = await response.json();
-        const resolvedFacility = payload.facility
-          ? FACILITIES.find(
-            (facility) => facility.toLowerCase() === String(payload.facility).toLowerCase()
-          )
-          : undefined;
+        const resolvedFacility = resolveFacility(payload.facility);
         updateData({
           picFirstName: sanitizeName(payload.picFirstName ?? ''),
           picLastName: sanitizeName(payload.picLastName ?? ''),
