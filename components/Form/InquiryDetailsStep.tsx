@@ -150,10 +150,29 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
     setLastLookupValue('');
     // Clear the other field to ensure mutual exclusivity in the data
     if (type === 'nysid') {
-      updateData({ bookAndCase: '' });
+      updateData({
+        bookAndCase: '',
+        picFirstName: '',
+        picLastName: '',
+        facility: ''
+      });
     } else {
-      updateData({ nysid: '' });
+      updateData({
+        nysid: '',
+        picFirstName: '',
+        picLastName: '',
+        facility: ''
+      });
     }
+  };
+
+  const handleIdValueChange = (type: 'nysid' | 'bookCase', value: string) => {
+    updateData({
+      ...(type === 'nysid' ? { nysid: value } : { bookAndCase: value }),
+      picFirstName: '',
+      picLastName: '',
+      facility: ''
+    });
   };
 
   return (
@@ -206,7 +225,7 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
                     key="nysid-input"
                     label="NYSID Number"
                     value={data.nysid}
-                    onChange={(e) => updateData({ nysid: e.target.value.toUpperCase() })}
+                    onChange={(e) => handleIdValueChange('nysid', e.target.value.toUpperCase())}
                     required
                     placeholder="e.g. 12345678Q"
                     helperText={isLookingUp ? 'Looking up PIC details...' : 'New York State Identification Number'}
@@ -220,7 +239,7 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
                     key="bc-input"
                     label="Book & Case Number"
                     value={data.bookAndCase}
-                    onChange={(e) => updateData({ bookAndCase: e.target.value })}
+                    onChange={(e) => handleIdValueChange('bookCase', e.target.value)}
                     required
                     placeholder="e.g. 87654321"
                     helperText={isLookingUp ? 'Looking up PIC details...' : 'Enter the 10-digit booking number to auto-fill PIC details.'}
