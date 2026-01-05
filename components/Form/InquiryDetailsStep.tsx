@@ -26,6 +26,12 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
   const bookCaseValidationError = hasBookCaseValue && !isBookCaseLengthValid
     ? 'Book & Case number must be exactly 10 digits.'
     : null;
+  const trimmedNysid = data.nysid.trim();
+  const hasNysidValue = trimmedNysid.length > 0;
+  const isNysidFormatValid = !hasNysidValue || /^\d{8}[A-Z]$/.test(trimmedNysid);
+  const nysidValidationError = hasNysidValue && !isNysidFormatValid
+    ? 'NYSID must be 8 digits followed by 1 capital letter.'
+    : null;
 
   const sanitizeName = (value: string) =>
     value.replace(/^[^A-Za-z]+|[^A-Za-z]+$/g, '');
@@ -72,6 +78,13 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
     }
 
     if (idType === 'bookCase' && trimmedValue.length !== 10) {
+      setLookupError(null);
+      setIsLookingUp(false);
+      setLastLookupValue('');
+      return;
+    }
+
+    if (idType === 'nysid' && !isNysidFormatValid) {
       setLookupError(null);
       setIsLookingUp(false);
       setLastLookupValue('');
@@ -197,10 +210,10 @@ export const InquiryDetailsStep: React.FC<Props> = ({ data, updateData, onNext, 
                     required
                     placeholder="e.g. 12345678Q"
                     helperText={isLookingUp ? 'Looking up PIC details...' : 'New York State Identification Number'}
-                    pattern="^[0-9A-Z]+$"
-                    title="NYSID must be alphanumeric."
-                    maxLength={10}
-                    error={lookupError ?? undefined}
+                    pattern="^\\d{8}[A-Z]$"
+                    title="NYSID must be 8 digits followed by 1 capital letter."
+                    maxLength={9}
+                    error={nysidValidationError ?? lookupError ?? undefined}
                 />
             ) : (
                 <Input
