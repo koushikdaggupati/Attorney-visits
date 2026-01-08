@@ -25,6 +25,14 @@ const apiLimiter = rateLimit({
   message: { error: 'Too many requests, please try again later.' }
 });
 
+const pageLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 120,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: 'Too many requests, please try again later.'
+});
+
 app.use(express.static(distPath));
 
 const DATAVERSE_API_URL = process.env.DATAVERSE_API_URL;
@@ -100,7 +108,7 @@ const getDataverseToken = async () => {
   return cachedToken;
 };
 
-app.get('/', (req, res) => {
+app.get('/', pageLimiter, (req, res) => {
   res.sendFile(path.join(distPath, 'index.html'));
 });
 
